@@ -29,6 +29,7 @@ function Pizza {
     }
 }
 
+
 #Funcion DIAS
 function Dias { 
     $meses = 31,29,31,30,31,30,31,31,30,31,30,31
@@ -46,6 +47,7 @@ function Dias {
     Write-Host "Hay un total de $pares días pares"
     Write-Host "Hay un total de $impares días impares"     
 }
+
 
 #Funcion MENU USUARIOS
 function Usuarios {
@@ -72,6 +74,7 @@ function Usuarios {
             Get-ADUser $nombre | RenameADObject -Newname $nombreNuevo}
         }
     }
+
 
 #FUNCION GRUPOS
 function Grupos {
@@ -108,6 +111,31 @@ function Grupos {
         5 { $grupo = Read-Host "Introduce el nombre del grupo"
             $usuario = Read-Host "Introduce el nombre del usuario"
             Remove-ADGroupMember -Identity $grupo -Members $usuario }
+    }
+}
+
+
+#FUNCION DISKP
+function diskp {
+    $numDisco = Read-Host "Introduce el número de disco"
+    $disco = Get-Disk -Number $numDisco
+    $GB = [math]::Round($disco.Size / 1GB, 2)
+    Write-Host "Tamaño del disco seleccionado: $GB GB"
+
+@"
+    select disk $disco
+    vale e
+    clean
+    convert gpt
+"@ | diskpart
+
+    $partCount = [math]::Floor($GB)
+    for($i = 1; $i -le $partCount; $i++)
+    {
+@"
+        select disk $disco
+        create partition primary size=1024
+"@ | diskpart
     }
 }
 
