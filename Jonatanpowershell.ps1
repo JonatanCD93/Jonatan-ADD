@@ -48,7 +48,7 @@ function Dias {
 }
 
 #Funcion MENU USUARIOS
-Usuarios {
+function Usuarios {
     Write-Host " "
     Write-Host "*********************"
     Write-Host "1. Listar Usuarios   "
@@ -58,10 +58,58 @@ Usuarios {
     Write-Host "*********************"
     Write-Host " "
 
-    while (($opcion = Read-Host "Elige uina opción del 1 al 4, 0 para salir") -ne 0) {
+    $opcion = Read-Host "Elige uina opción del 1 al 4, 0 para salir"
         switch ($opcion) {
+        1 {$nombres = Get-ADUser -Filter *
+            Write-Host $nombres.Name }
+        2 {$nombre = Read-Host "Nombre del usuario"
+            $pass = Read-Host -AsSecureString
+            New-ADUser -Name $nombre -AccountPassword $pass }
+        3 {$nombre = Read-Host "Nombre del usuario"
+            Remove-ADUser -Identity $nombre }
+        4 { $nombre = Read-Host "Nombre del usuario"
+            $nombreNuevo = Read-Host "Nuevo nombre del usuario"
+            Get-ADUser $nombre | RenameADObject -Newname $nombreNuevo}
+        }
+    }
 
+#FUNCION GRUPOS
+function Grupos {
+    Write-Host " "
+    Write-Host "*********************************"   
+    Write-Host "1. Listar grupos y miembros      "
+    Write-Host "2. Crear grupo                   "
+    Write-Host "3. Eliminar grupo                "
+    Write-Host "4. Crea miembro de un grupo      "
+    Write-Host "5. Elimina un miembro de un grupo"
+    Write-Host "*********************************"
+    Write-Host " "
 
+    $opcion = Read-Host "Elige una opción del menu"
+    switch($opcion) {
+        1 { foreach($grupo in Get-ADGroup -Filter *) {
+                Write-Host "$($grupo.Name):"
+                foreach($usuario in Get-ADGroupMember -Identity $grupo.Name) {
+                    Write-Host "  $($usuario.Name)"
+                }
+                Write-Host " " }
+          }
+
+        2 { $grupo = Read-Host "Introduce el nombre del grupo a crear"
+            New-ADGroup -Name $grupo -GroupScope Global}
+
+        3 { $grupo = Read-Host "Introduce el nombre del grupo a borrar"
+            Remove-ADGroup -Identity $grupo }
+
+        4 { $grupo = Read-Host "Introduce el nombre del grupo"
+            $usuario = Read-Host "Introduce el nombre del usuario"
+            Add-ADGroupMember -Identity $grupo -Members $usuario }
+
+        5 { $grupo = Read-Host "Introduce el nombre del grupo"
+            $usuario = Read-Host "Introduce el nombre del usuario"
+            Remove-ADGroupMember -Identity $grupo -Members $usuario }
+    }
+}
 
 
 Write-Host "******************"
@@ -88,6 +136,9 @@ switch ($opcion) {
         Dias
     }
     3 {
-        Menu usuarios
+        Usuarios
+    }
+    4 {
+        Grupos
     }
 }
