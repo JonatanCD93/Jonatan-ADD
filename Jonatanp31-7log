@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Fichero de salida (puedes cambiar la ruta si quieres)
+SALIDA="$HOME/errores_logs_sp31-7log.txt"
+
+# Vaciar/crear el archivo de salida
+> "$SALIDA"
+
+# Recorremos TODOS los archivos normales dentro de /var/log (incluyendo subdirectorios)
+find /var/log -type f | while read -r fichero; do
+    # Filtramos líneas que contengan "error" o "fail" (sin distinguir mayúsculas/minúsculas)
+    coincidencias=$(grep -iE "error|fail" "$fichero" 2>/dev/null)
+
+    # Si hay coincidencias (-n = la variable no está vacía)
+    if [ -n "$coincidencias" ]; then
+        {
+            echo "============================================================"
+            echo "ERRORES EN EL ARCHIVO: $fichero"
+            echo "============================================================"
+            echo "$coincidencias"
+            echo
+        } >> "$SALIDA"
+    fi
+done
+
+echo "Proceso terminado. Resultados guardados en: $SALIDA"
